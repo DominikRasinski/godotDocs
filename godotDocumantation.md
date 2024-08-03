@@ -5,6 +5,10 @@ Spis treści:
 - [Łaczenie komponentów](#łaczenie-komponentów-z-scen-aby-z-sobą-reagowały)
 - [Poprawienie pixeli](#poprawienie-pixeli)
 - [Tworzenie gracza](#tworzenie-gracza)
+- [TileMap](#tilemap)
+- [Tworzenie Background](#tworzenie-background)
+- [Globalny Skrypt](#globalny-skrypt)
+- [Tworzenie Przeciwnika](#tworzenie-przeciwnika)
 
 ## Sceny
 Sceny to główny element silnika które są wykorzystywane do opisu poszczególnych elementów gry takich jak:
@@ -68,3 +72,32 @@ Dodanie komponentu `AnimationPlayer` lub `AnimationTree` do sceny komponenty str
  
 ### Dodanie skryptu
 Po wszystkich czynnościach możemy przejść do dodania skryptu dla naszego gracza dokonujemy tego kliknięciu w `root` drzewa komponentów i wybieramy `Add Script`. Jeżeli `rootem` jest `CharacterBody2D` to przy dodawaniu skryptu zaznaczamy 'szablon' o nazwie `CharacterBody2D: Basic Movement`, dzięki czemu będziemy mieć skonfigurowane podstawowe funkcje dla naszej postaci.
+
+## TileMap
+Komponent TileMap służy nam do tworzenia poziomów z wykorzystaniem sprite'ów które po skonfigurowaniu TileMapy możemy bez trosko malować na Backgroundzie.
+Aby skonfigurować TileMap należy:
+1. Dodać komponent `TileMap` do sceny
+   - po prawej stronie w sekcji `TileMap` -> `Tileset` dodajemy nowy tileset
+   - aby skonfigurować kolizję dodajemy w `TileMap` -> `TileSet` -> `Physics Layers` -> `Add element`
+   - przechodzimy do sekcji `TileSet` na dole, wybieramy sekcję `Paint` -> `Phusics` -> `Layer of physics` aby zastosować nową kolizję na wskazanym elemencie należy w seksji na dole `TileSet` po prostu kliknąć na wskazany sprite i dostosować kolizję do sprite'a
+2. Tworzenie poziomu za pomocą `TileMap` musimy na dole edytora zaznaczyć sekcję `TileMap` i po prtostu wybrać pole w poziomie aby je zamalować nowym tilem
+
+## Tworzenie BackGround
+Do tworzenia backgroundu służy komponent `ParallaxBackground`.
+1. Dodajemy komponent `ParallaxBackground` do sceny
+2. Dodajemy do sceny komponent `ParallaxLayer`
+3. Dodajemy do sceny komponent `Sprite`
+
+Aby ustawić nieskończone przesuwanie się tła należy każdy `ParallaxLayer` ustawić `Mirroring` w punkcie kończenia się grafiki. Czyli jeżeli grafika się kończy w punkcie 1100 to mysimy wpisać w `Mirroring` do pola `x` wartość 1100. `x` i `y` to osie x jest odpowiedzialne za oś horyzontalną a y za oś wertykalną.
+Możemy również spowolnić przewijanie się tła ustawiając w `ParallaxLayer` -> `Scale` dla wartości horyzontalnej wybieramy `x` a dla wartości wertykalnej `y` zmniejszanie wartości zmniejsza prędkość przesuwania się tła.
+
+## Globalny skrypt
+Skrypty globalne możemy dodać do gry po prostu za pomocą dodania nowego sktyptu
+1. Tworzymy skrypt na przykład `Global.gd`
+2. Ustawienia `Projekt` -> `Autoładowanie` -> `dodanie ścieżki do skryptu` -> `Zaznaczenie na włączone`
+3. Skrypt będzie się automatycznie ładował po uruchomieniu gry
+
+## Tworzenie przeciwnika
+Proces tworzenia przeciwnika przechodzi dosyć w podobny sposób jak proces tworzenia gracza z wyjatkiem, że przy przeciwniku nie wykorzystujemy `Camera2D` oraz `AnimationPlayer`.
+
+Przeciwnicy wykorzystują komponent `Area2D`
