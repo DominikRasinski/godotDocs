@@ -144,10 +144,11 @@ func findPlayer():
 ```
 
 ## Globalny skrypt
-Skrypty globalne możemy dodać do gry po prostu za pomocą dodania nowego sktyptu
+Skrypty globalne możemy dodać do gry za pomocą dodania nowego skryptu
 1. Tworzymy skrypt na przykład `Global.gd`
 2. Ustawienia `Projekt` -> `Autoładowanie` -> `dodanie ścieżki do skryptu` -> `Zaznaczenie na włączone`
 3. Skrypt będzie się automatycznie ładował po uruchomieniu gry
+   - Możemy podejrzeć czy skrypt się załadował gdy gra jest odpalona to przechodzimy w edytorze Godot do zakładki `Zdalny` lub `Remote` po lewej stronie.
 
 ## Tworzenie drabiny
 Tworzenie drabiny jest trochę skomplikowane pod warunkiem jeżeli wykorzystamy do tego sposób aby nie dodawać oddzielnego sprite'a oraz oddzielnej detekcji kolizji
