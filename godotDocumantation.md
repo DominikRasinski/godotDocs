@@ -4,6 +4,7 @@ Spis treści:
 - [Sceny](#sceny)
 - [Łaczenie komponentów](#łaczenie-komponentów-z-scen-aby-z-sobą-reagowały)
 - [Poprawienie pixeli](#poprawienie-pixeli)
+- [Poprawienie widoku fullScreen](#poprawienie-widoku-w-fullscreen)
 - [Tworzenie gracza](#tworzenie-gracza)
 - [TileMap](#tilemap)
 - [Tworzenie Background](#tworzenie-background)
@@ -36,6 +37,10 @@ Aby wykorzystać któryś z dostępnych sygnałów jak na przykład sygnał `pre
 Godot w domyślnych ustawieniach projektu ma ustawione pixele na `linear` co rozmazuje dosyć sprity jakie będziemy wykorzystywać w projekcie aby to zmienić i nie musieć tego zmieniać dla każdego sprite'a który zostanie dodany do projektu należy:
 1. W menu `Project` wybrać opcję `Project Settings`
 2. W sekcji `Rendering` -> `Textures` zmienić opcję `Texture Filter` na `Nearest`
+
+## Poprawienie widoku w fullScreen
+1. W menu `Project` wybrać opcję `Project Settings`
+2. W sekcji `Display` -> `Window` zmienić opcję `mode` na `viewport` oraz `aspect` na `expand`
 
 ## Tworzenie gracza
 Aby stworzyć gracza najlepiej zacząć to od stworzenia nowej sceny, która powinna mieć nazwę Player w scenie należy dodać odpowiednie elementy:
