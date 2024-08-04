@@ -7,8 +7,9 @@ Spis treści:
 - [Tworzenie gracza](#tworzenie-gracza)
 - [TileMap](#tilemap)
 - [Tworzenie Background](#tworzenie-background)
-- [Globalny Skrypt](#globalny-skrypt)
 - [Tworzenie Przeciwnika](#tworzenie-przeciwnika)
+- [Globalny Skrypt](#globalny-skrypt)
+- [Drabina](#tworzenie-drabiny)
 
 ## Sceny
 Sceny to główny element silnika które są wykorzystywane do opisu poszczególnych elementów gry takich jak:
@@ -67,11 +68,32 @@ Dodanie komponentu `AnimationPlayer` lub `AnimationTree` do sceny komponenty str
 4. Po utworzeniu nowej animacji w linii czasu należy dodać nowe klatki animacji. Robimy to wybierają pojedynczo klatkę animacji w sekcji `Animation` -> `Frame` i klikając ikonę `klucza` obok
    - Linię czasu animacji musimy przybliżyć aby klatki animacji nie były oddzielone od siebie w sekundach aby tego dokonać klikamy na dolne okno z otwartą linią czasu, trzymając `CTRL` + `Kółko myszy` możemy dostosować linię czasu.
 5. Po dodaniu wszystkich klatek animacji należy dostosować długość animacji zmieniając wartość `1` na wartość najbliższej pełnej klatki po klatce animacji.
-6. Zapętlenie animacji wykonujemy po kliknięciu ikonki `Zapętlenia` czyli dwóch strzałek po prawej stronie okna animacji u dołu ekranu
-7. Animacja podstawowa `Idle` animacja podstawowa ma to do siebie, że powinna być odgrywana w momencie gdy postać jest dodana do sceny dlatego aby tego dokonać należy zaznaczyć jaka animacja powinna być odgrywana jako podstawowa i kliknąć ikonę `Play z znakiem A`
+6. Zapętlenie animacji wykonujemy po kliknięciu ikonki `Zapętlenia` czyli dwóch strzałek po prawej stronie okna animacji u dołu ekranu ![](/img/zapetlenie.png)
+7. Animacja podstawowa `Idle` animacja podstawowa ma to do siebie, że powinna być odgrywana w momencie gdy postać jest dodana do sceny dlatego aby tego dokonać należy zaznaczyć jaka animacja powinna być odgrywana jako podstawowa i kliknąć ikonę `Play z znakiem A` ![](/img/default-play.png)
  
 ### Dodanie skryptu
 Po wszystkich czynnościach możemy przejść do dodania skryptu dla naszego gracza dokonujemy tego kliknięciu w `root` drzewa komponentów i wybieramy `Add Script`. Jeżeli `rootem` jest `CharacterBody2D` to przy dodawaniu skryptu zaznaczamy 'szablon' o nazwie `CharacterBody2D: Basic Movement`, dzięki czemu będziemy mieć skonfigurowane podstawowe funkcje dla naszej postaci.
+
+Tworzenie prostego skryptu obsługującego HP gracza
+
+```
+var health = 10
+
+<!-- Usunięcie gracza i przerzucenie do menu głównego gdy jest martwy -->
+if health <= 0:
+   queue_free()
+   get_tree().change_scene_to_file("res://mainMenu/main_menu.tscn")
+```
+
+Wyświetlanie HP w poziomie - najlepiej wykorzystać komponent `Label` w scenie poziomu z wbudowanym skryptem który będzie wyświetlał zaktualizowaną wartość HP gracza
+```
+func _process(delta):
+	text = "HP: " + str(get_node("../../Player/Player").health)
+   
+```
+
+Oczywiście do aktualizowania wartości HP gracza należy posiadać przeciwnika który będzie zadawał obrażenia graczowi, tworzenie przeciwnika można przeczytać w tej sekcji [Tworzenie przeciwnika](#tworzenie-przeciwnika)
+
 
 ## TileMap
 Komponent TileMap służy nam do tworzenia poziomów z wykorzystaniem sprite'ów które po skonfigurowaniu TileMapy możemy bez trosko malować na Backgroundzie.
@@ -91,13 +113,50 @@ Do tworzenia backgroundu służy komponent `ParallaxBackground`.
 Aby ustawić nieskończone przesuwanie się tła należy każdy `ParallaxLayer` ustawić `Mirroring` w punkcie kończenia się grafiki. Czyli jeżeli grafika się kończy w punkcie 1100 to mysimy wpisać w `Mirroring` do pola `x` wartość 1100. `x` i `y` to osie x jest odpowiedzialne za oś horyzontalną a y za oś wertykalną.
 Możemy również spowolnić przewijanie się tła ustawiając w `ParallaxLayer` -> `Scale` dla wartości horyzontalnej wybieramy `x` a dla wartości wertykalnej `y` zmniejszanie wartości zmniejsza prędkość przesuwania się tła.
 
+## Tworzenie przeciwnika
+Proces tworzenia przeciwnika przechodzi dosyć w podobny sposób jak proces tworzenia gracza z wyjatkiem, że przy przeciwniku nie wykorzystujemy `Camera2D` oraz `AnimationPlayer`.
+
+Najważniejszą różnicą przeciwnika jest to, że przeciwnik nie jest sterowany przez gracza i musimy rozwiązać problem poznania lokalizacji gdzie przebywa gracz, aby tego dokonać wykorzystujemy zazwyczaj komponent `Area2D`
+
+1. Dodajemy komponent `Area2D` konfigurujemy jego kolizję za pomocą komponentu `CollisionShape2D`
+2. Do komponentu `CharacterBody2D` dodajemy skrypt może być to szablon wykorzystywany w graczu.
+3. Z komponentu `Area2D` wysyłamy sygnał `body_entered` do komponentu `CharacterBody2D`
+   - Jeżeli zmienna `body` jest równa nawie ciała jakie posiada gracz (ustalona nazwa node **CharacterBody2D** w scenie z graczem) możemy przejść do konfiguracji akcji jakie mają zajść przy kolizji gracza z kolizją strefy przeciwnika.
+4. Stworzenie funkcji śledzącej pozycję gracza
+```
+@onready var player = get_node("../../Player/Player")
+@onready var animSprite = get_node("AnimatedSprite2D")
+var chase = false
+
+func findPlayer(): 
+	var direction = (player.position - self.position).normalized()
+	if direction.x > 0:
+		animSprite.flip_h = true
+	else:
+		animSprite.flip_h = false
+	velocity.x = direction.x * SPEED
+	animSprite.play("Jump")
+```
+
 ## Globalny skrypt
 Skrypty globalne możemy dodać do gry po prostu za pomocą dodania nowego sktyptu
 1. Tworzymy skrypt na przykład `Global.gd`
 2. Ustawienia `Projekt` -> `Autoładowanie` -> `dodanie ścieżki do skryptu` -> `Zaznaczenie na włączone`
 3. Skrypt będzie się automatycznie ładował po uruchomieniu gry
 
-## Tworzenie przeciwnika
-Proces tworzenia przeciwnika przechodzi dosyć w podobny sposób jak proces tworzenia gracza z wyjatkiem, że przy przeciwniku nie wykorzystujemy `Camera2D` oraz `AnimationPlayer`.
+## Tworzenie drabiny
+Tworzenie drabiny jest trochę skomplikowane pod warunkiem jeżeli wykorzystamy do tego sposób aby nie dodawać oddzielnego sprite'a oraz oddzielnej detekcji kolizji
 
-Przeciwnicy wykorzystują komponent `Area2D`
+1. Tworzymy `TileMap` wraz z `TileSet` z jednym sprite'em który będzie naszą drabiną - nazwa `TileMap` powinna zostać zmieniona na `Ladder`
+2. Po dodaniu `TileSet` ustawiamy po prawej stronie w inspektorze `Physic Layers` -> `Collision Layer` -> `dodajemy nową warstwę z nazwą Ladder`
+w tym samym miejscu wyłączamy `Collision Mask` aby nic nie mogło reagować na drabinę, oczywiście prócz nas
+3. Dodajemy do gracza komponent `Area2D` który będzie sprawdzać detekcję czy gracz wszedł w tile który jest drabiną
+   - Ustawiamy `Area2D` w inspektorze `Collision` -> `Layer` na zero czyli odznaczamy wszystkie zaznaczone warstwy
+   - Ustawiamy `Area2D` w inspektorze `Collision` -> `Mask` na warstwę tą która jest wykorzystywana przez `TileMap` o nazwie `Ladder`
+4. Po dodaniu `Area2D` musimy z nią połączyć sygnał robimy to poprzez wybranie po prawej stronie w inspektorze zakładki `Węzeł` i wybranie dwóch sygnałów:
+   - `body_entered`
+   - `body_exited`
+Jeżeli `body_entered` zostanie zarejestrowane to zmieniamy zmienną w skrypcie gracza `on_ladder` na `true`
+Jeżeli `body_exited` zostanie zarejestrowane to zmieniamy zmienną w skrypcie gracza `on_ladder` na `false`
+
+Gdy zmienna `on_ladder` jest równa true wyłączamy działanie grawitacji na gracza i możemy uruchomić funkcję odpowiedzialną za poruszanie się po drabinie czyli tak naprawdę po kliknięciu strzałki w górę postać powinna się poruszać w górę i na odwrót jak zostanie kliknięta strzałka w dół.
