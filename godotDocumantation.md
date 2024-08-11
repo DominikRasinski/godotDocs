@@ -13,6 +13,7 @@ Spis treści:
 - [Tworzenie drabiny](#tworzenie-drabiny)
 - [Tworzenie 'zbieralnych' elementów](#tworzenie-zbieralnych-elementów)
 - [Wykorzystanie Timera](#wykorzystanie-timera)
+- [Tworzenie spawnera](#tworzenie-spawnera)
 
 ## Sceny
 Sceny to główny element silnika które są wykorzystywane do opisu poszczególnych elementów gry takich jak:
@@ -265,4 +266,14 @@ func spawnCherry() -> void:
 func _on_timer_timeout() -> void:
 	spawnCherry()
 	spawnGems()
+```
+`cherryTemp.position` - odwołanie sie do pozycji danego node za pomocą Vector2(x, y) można ustawić gdzie dany element powinien się pojawić. Najczęściej w Osi X podajemy losowe liczby z danego przedziału.
+
+Tworzenie generatora losowych liczb
+
+```
+func randomGeneretor(rangeFrom: int, rangeTo: int) -> int:
+	var rng = RandomNumberGenerator.new()
+	var ranInt: int = rng.randi_range(rangeFrom, rangeTo)
+	return ranInt
 ```
