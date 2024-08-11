@@ -1,27 +1,18 @@
 # Podstawy korzystania z silnika do gier Godot
 Spis treści:
 
-- [Podstawy korzystania z silnika do gier Godot](#podstawy-korzystania-z-silnika-do-gier-godot)
-  - [Sceny](#sceny)
-  - [Łaczenie komponentów z scen aby z sobą reagowały](#łaczenie-komponentów-z-scen-aby-z-sobą-reagowały)
-    - [Kolejnym sposobem na łaczenie elementów jest wywoływanie sygnałów](#kolejnym-sposobem-na-łaczenie-elementów-jest-wywoływanie-sygnałów)
-  - [Poprawienie pixeli](#poprawienie-pixeli)
-  - [Poprawienie widoku w fullScreen](#poprawienie-widoku-w-fullscreen)
-  - [Tworzenie gracza](#tworzenie-gracza)
-    - [Opis konfiguracji poszczególnych węzłów aby stworzyć gracza](#opis-konfiguracji-poszczególnych-węzłów-aby-stworzyć-gracza)
-      - [CharacterBody2D](#characterbody2d)
-    - [AnimatedSprite](#animatedsprite)
-    - [CollisionShape2D](#collisionshape2d)
-    - [Camera2D](#camera2d)
-    - [AnimationPlayer](#animationplayer)
-    - [Dodanie skryptu](#dodanie-skryptu)
-  - [TileMap](#tilemap)
-  - [Tworzenie BackGround](#tworzenie-background)
-  - [Tworzenie przeciwnika](#tworzenie-przeciwnika)
-  - [Globalny skrypt](#globalny-skrypt)
-  - [Tworzenie drabiny](#tworzenie-drabiny)
-  - [Tworzenie 'zbieralnych' elementów](#tworzenie-zbieralnych-elementów)
-  - [Wykorzystanie Timera](#wykorzystanie-timera)
+- [Sceny](#sceny)
+- [Łaczenie komponentów z scen aby z sobą reagowały](#łaczenie-komponentów-z-scen-aby-z-sobą-reagowały)
+- [Poprawienie pixeli](#poprawienie-pixeli)
+- [Poprawienie widoku w fullScreen](#poprawienie-widoku-w-fullscreen)
+- [Tworzenie gracza](#tworzenie-gracza)
+- [TileMap](#tilemap)
+- [Tworzenie BackGround](#tworzenie-background)
+- [Tworzenie przeciwnika](#tworzenie-przeciwnika)
+- [Globalny skrypt](#globalny-skrypt)
+- [Tworzenie drabiny](#tworzenie-drabiny)
+- [Tworzenie 'zbieralnych' elementów](#tworzenie-zbieralnych-elementów)
+- [Wykorzystanie Timera](#wykorzystanie-timera)
 
 ## Sceny
 Sceny to główny element silnika które są wykorzystywane do opisu poszczególnych elementów gry takich jak:
@@ -156,10 +147,63 @@ func findPlayer():
 
 ## Globalny skrypt
 Skrypty globalne możemy dodać do gry za pomocą dodania nowego skryptu
-1. Tworzymy skrypt na przykład `Global.gd`
+1. Tworzymy skrypt na przykład `Game.gd`
 2. Ustawienia `Projekt` -> `Autoładowanie` -> `dodanie ścieżki do skryptu` -> `Zaznaczenie na włączone`
 3. Skrypt będzie się automatycznie ładował po uruchomieniu gry
    - Możemy podejrzeć czy skrypt się załadował gdy gra jest odpalona to przechodzimy w edytorze Godot do zakładki `Zdalny` lub `Remote` po lewej stronie.
+## Tworzenie prostego systemu zapisu i wczytywania
+Aby stworzyć prosty system zapisów oraz ładowania apisu należy najpierw posiadać globalne skrypty na samym początku musimy zdefiniować ścieżkę gdzie będzie zapisywany plik z
+zapisanymi danymi gracza:
+
+Przykładowe drzewo plików globalnych
+```
+res://
+|
+|__ Global 
+|        |
+|        |__Game.gd - plik przechowujący stricte zmienne 
+|        |            odwołujące się bezpośrednio do gracza 
+|        |
+|        |__Utils.gd - plik przechowujący różne funkcje pomocnicze
+```
+
+
+Ścieżka testowa na czas developmentu
+```
+const SAVE_PATH = "res://savegame.bin"
+```
+
+Zalecana ścieżka kiedy development zostanie zakończony - ścieżka się różni głównym folderem zamiast **res** jest wykorzystywany **user**
+dzięki temu pliki będą zapisywane nie zależnie na jakiej platformie gra się ukaże czy to Android, PC, Linux, MaxOS.
+```
+const SAVE_PATH = "user://savegame.bin"
+```
+Przykładowy kod pozwalający na zapis oraz odczyt aktualnego stanu gracza - kod powinien znajdować się w globalnym pliku **Utils.gd**
+```
+func saveGame():
+	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	var data: Dictionary = {
+		"playerHP": Game.playerHP,
+		"gold": Game.gold,
+	}
+	var jstr = JSON.stringify(data)
+	file.store_line(jstr)
+	
+func loadGame():
+	var file = FileAccess.open(SAVE_PATH, FileAccess.READ)
+	if FileAccess.file_exists(SAVE_PATH) == true:
+		if not file.eof_reached():
+			var current_line = JSON.parse_string(file.get_line())
+			if current_line:
+				Game.playerHP = current_line["playerHP"]
+				Game.gold = current_line["gold"]
+```
+Przykładowa zawartość pliku globalnego **Game.gd**
+```
+var playerHP = 10
+var gold = 0
+```
+
 
 ## Tworzenie drabiny
 Tworzenie drabiny jest trochę skomplikowane pod warunkiem jeżeli wykorzystamy do tego sposób aby nie dodawać oddzielnego sprite'a oraz oddzielnej detekcji kolizji
@@ -179,5 +223,46 @@ Jeżeli `body_exited` zostanie zarejestrowane to zmieniamy zmienną w skrypcie g
 Gdy zmienna `on_ladder` jest równa true wyłączamy działanie grawitacji na gracza i możemy uruchomić funkcję odpowiedzialną za poruszanie się po drabinie czyli tak naprawdę po kliknięciu strzałki w górę postać powinna się poruszać w górę i na odwrót jak zostanie kliknięta strzałka w dół.
 
 ## Tworzenie 'zbieralnych' elementów
+Elementy możliwe do interakcji takiej jak podniesienie przez gracza potki pozwalającej na dodanie określonej ilości życia lub dodanie określonej ilości złota tworzymy za pomocą:
+
+1. Dodajemy do nowej sceny komponent `Area2D`
+2. Dodajemy do sceny komponent `CollisionShape2D`
+3. Dodajemy komponent `AnimatedSprite2D` lub po prostu `Sprite`
+
+Dodajemy skrypt do `Area2D` który będzie obsługiwać sygnał `_on_body_entered(body)` jeżeli nazwa ciała jakie weszło w strefę interakcji z naszym zbieralnym elementem jest równa nazwie ciała `Player` element powinien zareagować na przykład tym, że dodajemy graczowi +5 HP czyli odnośmy się do globalnego skryptu obsługującego logikę gry. Jak zaimplementować globalny skrypt tutaj [Tworzenie globalnego skryptu](#globalny-skrypt)
+
 
 ## Wykorzystanie Timera
+Timer jest komponentem o takiej samej nazwie czyli `Timer` pozwala on nam na wykorzystanie **sygnału** o nazwie `_on_timer_timeout` czyli podczas każdej sekundy będzie wykonywana funkcja
+## Tworzenie spawnera
+Aby stworzyć prosty spawner należy wykorzystać komponent `Timer` który będzie wysyłać sygnał `_on_timer_timeout` najlepiej aby taki spawn był trochę uporządkowany za pomocą wrzucania odpowiednich node'ów do odpowiednich folderów.
+
+Po skonfigurowaniu odpowiednio struktury scen należy dodać do głównego noda dodać skrypt:
+
+```
+res://
+|
+|__ collectables - folder główny do niego dodajemy skrypt
+      |
+      |__Timer - timer powiazany z skryptem
+      |
+      |__cherrys
+            |
+            |__cherry.tscn - scena z elementem do zbierania
+```
+
+Kod pozwalający na proste spawnienie elementów:
+
+```
+var cherryTscn: Resource = preload('res://collectebles/Cherry.tscn')
+@onready var cherryDirectory: Node = get_node("./cherrys")
+
+func spawnCherry() -> void:
+	var cherryTemp: Node = cherryTscn.instantiate()
+	cherryTemp.position = Vector2(randomGeneretor(20, 400), 470)
+	cherryDirectory.add_child(cherryTemp)
+
+func _on_timer_timeout() -> void:
+	spawnCherry()
+	spawnGems()
+```
