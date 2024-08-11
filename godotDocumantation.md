@@ -1,16 +1,27 @@
 # Podstawy korzystania z silnika do gier Godot
 Spis treści:
 
-- [Sceny](#sceny)
-- [Łaczenie komponentów](#łaczenie-komponentów-z-scen-aby-z-sobą-reagowały)
-- [Poprawienie pixeli](#poprawienie-pixeli)
-- [Poprawienie widoku fullScreen](#poprawienie-widoku-w-fullscreen)
-- [Tworzenie gracza](#tworzenie-gracza)
-- [TileMap](#tilemap)
-- [Tworzenie Background](#tworzenie-background)
-- [Tworzenie Przeciwnika](#tworzenie-przeciwnika)
-- [Globalny Skrypt](#globalny-skrypt)
-- [Drabina](#tworzenie-drabiny)
+- [Podstawy korzystania z silnika do gier Godot](#podstawy-korzystania-z-silnika-do-gier-godot)
+  - [Sceny](#sceny)
+  - [Łaczenie komponentów z scen aby z sobą reagowały](#łaczenie-komponentów-z-scen-aby-z-sobą-reagowały)
+    - [Kolejnym sposobem na łaczenie elementów jest wywoływanie sygnałów](#kolejnym-sposobem-na-łaczenie-elementów-jest-wywoływanie-sygnałów)
+  - [Poprawienie pixeli](#poprawienie-pixeli)
+  - [Poprawienie widoku w fullScreen](#poprawienie-widoku-w-fullscreen)
+  - [Tworzenie gracza](#tworzenie-gracza)
+    - [Opis konfiguracji poszczególnych węzłów aby stworzyć gracza](#opis-konfiguracji-poszczególnych-węzłów-aby-stworzyć-gracza)
+      - [CharacterBody2D](#characterbody2d)
+    - [AnimatedSprite](#animatedsprite)
+    - [CollisionShape2D](#collisionshape2d)
+    - [Camera2D](#camera2d)
+    - [AnimationPlayer](#animationplayer)
+    - [Dodanie skryptu](#dodanie-skryptu)
+  - [TileMap](#tilemap)
+  - [Tworzenie BackGround](#tworzenie-background)
+  - [Tworzenie przeciwnika](#tworzenie-przeciwnika)
+  - [Globalny skrypt](#globalny-skrypt)
+  - [Tworzenie drabiny](#tworzenie-drabiny)
+  - [Tworzenie 'zbieralnych' elementów](#tworzenie-zbieralnych-elementów)
+  - [Wykorzystanie Timera](#wykorzystanie-timera)
 
 ## Sceny
 Sceny to główny element silnika które są wykorzystywane do opisu poszczególnych elementów gry takich jak:
@@ -166,3 +177,7 @@ Jeżeli `body_entered` zostanie zarejestrowane to zmieniamy zmienną w skrypcie 
 Jeżeli `body_exited` zostanie zarejestrowane to zmieniamy zmienną w skrypcie gracza `on_ladder` na `false`
 
 Gdy zmienna `on_ladder` jest równa true wyłączamy działanie grawitacji na gracza i możemy uruchomić funkcję odpowiedzialną za poruszanie się po drabinie czyli tak naprawdę po kliknięciu strzałki w górę postać powinna się poruszać w górę i na odwrót jak zostanie kliknięta strzałka w dół.
+
+## Tworzenie 'zbieralnych' elementów
+
+## Wykorzystanie Timera
